@@ -2,7 +2,6 @@ package com.fastcampus.ch4.controller;
 
 import com.fastcampus.ch4.domain.BoardDto;
 import com.fastcampus.ch4.domain.PageHandler;
-import com.fastcampus.ch4.domain.SearchCondition;
 import com.fastcampus.ch4.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -117,21 +116,28 @@ public class BoardController {
     }
 
     @GetMapping("/list")
-//    Integer page, Integer pageSize, String option, String keyword 를 SearchCondition sc으로 변경처리함
-    public String list(SearchCondition sc, Model m, HttpServletRequest request) {
+    public String list(Integer page, Integer pageSize, Model m, HttpServletRequest request) {
         if(!loginCheck(request))
             return "redirect:/login/login?toURL="+request.getRequestURL();  // 로그인을 안했으면 로그인 화면으로 이동
 
+        if (page ==null) page= 1;
+        if (pageSize == null) pageSize=10;
+
+
         try {
 
-            int totalCnt = boardService.getSearchResultCnt(sc);
-            PageHandler pageHandler = new PageHandler(totalCnt, sc);
+            int totalCnt = boardService.getCount();
+            PageHandler pageHandler = new PageHandler(totalCnt, page, pageSize);
 
-            List<BoardDto> list = boardService.getSearchResultPage(sc);
+            Map map = new HashMap();
+            map.put("offset" , ( page -1 ) * pageSize);
+            map.put("pageSize", pageSize);
+
+            List<BoardDto> list = boardService.getPage(map);
             m.addAttribute("list", list);
             m.addAttribute("ph", pageHandler);
-            m.addAttribute("page", sc);
-            m.addAttribute("pageSize" , sc);
+            m.addAttribute("page", page);
+            m.addAttribute("pageSize" , pageSize);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

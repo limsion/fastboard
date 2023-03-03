@@ -50,23 +50,6 @@
         LIMIT #{offset}, #{pageSize}
     </select>
 
-
-    <select id="searchSelectPage"  parameterType="SearchCondition" resultType="BoardDto">
-        SELECT bno, title, content, writer, view_cnt, comment_cnt, reg_date
-        FROM board
-        where  true
-        and title like concat('%', #{keyword}, '%')
-        ORDER BY reg_date DESC, bno DESC
-            LIMIT #{offset}, #{pageSize}
-    </select>
-
-    <select id="searchResultCnt"  parameterType="SearchCondition" resultType="int">
-        SELECT count(*)
-        FROM board
-        where  true
-          and title like concat('%', #{keyword}, '%')
-    </select>
-
     <sql id="selectFromBoard">
         SELECT bno, title, content, writer, view_cnt, comment_cnt, reg_date
         FROM board
